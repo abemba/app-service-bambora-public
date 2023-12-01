@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("status");
             $table->enum("type",["credit","debit"]);
             $table->date("scheduled_for");
+            $table->string("bambora_batch_id")->nullable();
             $table->string("descriptor",20)->nullable();
             $table->timestamps();
             

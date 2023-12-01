@@ -7,6 +7,7 @@ use App\Enum\TransactionStatus;
 use App\Models\BankAccount;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AppController extends Controller
 {
@@ -19,18 +20,26 @@ class AppController extends Controller
         "branch_number" => "required|string|size:5",
         "bank_number" => "required|string|size:3",
         "app_name" => "required|string",
+        "first_name" => "required|string",
+        "last_name" => "required|string",
+        "middle_name" => "string",
     ]);
         $account = BankAccount::whereAppName($authToken->getAppName())
         ->whereAccountNumber($request->input("account_number"))
         ->whereBankNumber($request->input("bank_number"))
         ->whereBranchNumber($request->input("branch_number"))
+        ->whereFirstName($request->input("first_name"))
+        ->whereLastName($request->input("last_name"))
         ->first();
         
         if($account){
             return $account;
         }
             
-        $account = new BankAccount($request->only(["account_number","bank_number","branch_number","app_name"]));
+        $account = new BankAccount($request->only(["account_number","bank_number","branch_number","app_name","first_name","last_name","middle_name"]));
+        $account->first_name = Str::upper($account->first_name);
+        $account->last_name = Str::upper($account->last_name);
+        $account->middle_name = Str::upper($account->middle_name);
         $account->id = $account->generateUniqueId();
         $account->save();
         

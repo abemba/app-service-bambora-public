@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('bambora_batches', function (Blueprint $table) {
             $table->string("id")->unique()->primary();
             $table->string("filename");
-            $table->string("bambora_batch_id")->nullable();
+            $table->string("batch_upload_id")->nullable();
             $table->string("status");
+            $table->unsignedBigInteger("count")->nullable();
             $table->timestamps();
         });
     }

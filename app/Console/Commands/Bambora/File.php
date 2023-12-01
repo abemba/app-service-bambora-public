@@ -6,6 +6,7 @@ use App\Enum\BamboraBatchStatus;
 use App\Enum\TransactionStatus;
 use App\Enum\TransactionType;
 use App\Models\BamboraBatch;
+use App\Models\BankAccount;
 use App\Models\Transaction;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -36,11 +37,14 @@ class File extends Command
         $transactions = $transactions_query->whereScheduledFor($date)->get();
         
         if($transactions->count()){
-            $transactions_query->update(["status" => TransactionStatus::PROCESSING]);
             $filename = $this->createCsvFile($transactions);
-            $batch = new BamboraBatch(["filename"=>$filename, "status"=> BamboraBatchStatus::CREATED]);
+
+            $batch = new BamboraBatch(["filename"=>$filename,"count"=>$transactions->count(), "status"=> BamboraBatchStatus::CREATED]);
             $batch->id = $batch->generateUniqueId();
             $batch->save();
+
+            $transactions_query->update(["status" => TransactionStatus::PROCESSING, "bambora_batch_id" => $batch->id]);
+
             $this->info("Transactions saved in: $filename");
         }else{
             $this->alert("No scheduled transactions.");
@@ -50,34 +54,37 @@ class File extends Command
     private function createCsvFile(Collection $transactions): string{
         $content = "";
         
-        $transactions->each(function($item) use(&$content){
+        $transactions->each(function($transaction) use(&$content){
+
+            $account = BankAccount::whereId($transaction->bank_account_id)->first();
+
             // Transaction Class
     		$row = "E";
             
             // Transaction Type
-            $type = TransactionType::from($item->type);
+            $type = TransactionType::from($transaction->type);
 			$row = $row .",".$type->getBamboraType();
             
             // Bank Number
-			$row = $row .",".$item->bank_number;
+			$row = $row .",".$account->bank_number;
             
             // Transit Number
-			$row = $row .",".$item->branch_number;
+			$row = $row .",".$account->branch_number;
             
             // Account Number
-			$row = $row .",".$item->account_number;
+			$row = $row .",".$account->account_number;
             
             // Amount
-			$row = $row .",".$item->amount;
+			$row = $row .",".$transaction->amount;
             
             // Reference id
-			$row = $row .",".$item->id;
+			$row = $row .",".$transaction->id;
             
             // Full name
-			$row = $row .",".$item->first_name." ".$item->middle_name." ".$item->last_name;
+			$row = $row .",".$account->first_name." ".$account->middle_name." ".$account->last_name;
             
             // Descriptor
-			$row = $row.",,".$item->descriptor ?? "AlgofameCA";
+			$row = $row.",,".$transaction->descriptor ?? "AlgofameCA";
             
             if(!empty($content)){
                 $content = $content."\n\r";
@@ -87,7 +94,7 @@ class File extends Command
         });
         
         $filename = "bambora_batch_".date("Y_m_d_",strtotime("yesterday")).time();
-        $path = storage_path("bambora/$filename");
+        $path = storage_path("bambora/$filename.csv");
         $stream = fopen($path,"w+");
         
         fwrite($stream,$content);

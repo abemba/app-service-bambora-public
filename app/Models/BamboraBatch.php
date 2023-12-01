@@ -10,6 +10,7 @@ class BamboraBatch extends Model
 {
     use HasFactory, HasCustomId;
     protected $id_prefix = "bambora_batch_";
+    protected $guarded = [];
     
     /**
      * Indicates if the model's ID is auto-incrementing.
