@@ -44,7 +44,7 @@ class File extends Command
             $batch->scheduled_date = $date;
             $batch->save();
 
-            $transactions_query->update(["status" => TransactionStatus::PROCESSING, "bambora_batch_id" => $batch->id]);
+            $transactions_query->update(["status" => TransactionStatus::FILE_CREATED, "bambora_batch_id" => $batch->id]);
 
             $this->alert("Transactions saved in: $filename");
         }else{

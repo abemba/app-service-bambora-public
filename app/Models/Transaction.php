@@ -12,6 +12,7 @@ class Transaction extends Model
     use HasFactory, HasCustomId;
     protected $guarded = [];
     protected $id_prefix = "transaction_";
+    protected $id_size = 7;
     
     /**
      * Indicates if the model's ID is auto-incrementing.

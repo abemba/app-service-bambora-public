@@ -3,7 +3,9 @@
 namespace App\Console\Commands\Bambora;
 
 use App\Enum\BamboraBatchStatus;
+use App\Enum\TransactionStatus;
 use App\Models\BamboraBatch;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -47,6 +49,8 @@ class Upload extends Command
                     $batch->process_date = $responseObject['process_date'];
                     $batch->status = BamboraBatchStatus::PENDING_BAMBORA_PROCESSING;
                     $batch->save();
+
+                    Transaction::whereBamboraBatchId($batch->id)->update(["status" => TransactionStatus::UPLOADED_TO_BAMBORA]);
                 }else{
                     $this->error("Batch upload failed.");
                 }
@@ -74,7 +78,6 @@ class Upload extends Command
 					[
                         "Authorization"=>"Passcode $passcode"
 					],
-                    "defaults" => [ "verify" => false],
                     "verify" => false
 			]);
 
