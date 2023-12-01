@@ -41,11 +41,12 @@ class File extends Command
 
             $batch = new BamboraBatch(["filename"=>$filename,"count"=>$transactions->count(), "status"=> BamboraBatchStatus::CREATED]);
             $batch->id = $batch->generateUniqueId();
+            $batch->scheduled_date = $date;
             $batch->save();
 
             $transactions_query->update(["status" => TransactionStatus::PROCESSING, "bambora_batch_id" => $batch->id]);
 
-            $this->info("Transactions saved in: $filename");
+            $this->alert("Transactions saved in: $filename");
         }else{
             $this->alert("No scheduled transactions.");
         }
