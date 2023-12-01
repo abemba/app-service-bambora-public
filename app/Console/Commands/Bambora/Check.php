@@ -32,9 +32,11 @@ class Check extends Command
     public function handle()
     {
         $batches = BamboraBatch::whereStatus(BamboraBatchStatus::PENDING_BAMBORA_PROCESSING)->get();
+
+        $this->newLine();
         $this->alert("Checking status of ".$batches->count()." batches on ".date("Y-m-d"));
+
         $batches->each(function($batch){
-            $this->newLine();
             $this->info("Batch: ".$batch->id);
             $this->info("Count: ".$batch->count);
             $xml=$this->build_xml($batch->batch_upload_id);
