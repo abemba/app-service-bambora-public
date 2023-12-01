@@ -4,8 +4,39 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c491b8531eec05ba41a11d9276a5749",
+    "content-hash": "063b119233ed29126973e3166cd03340",
     "packages": [
+        {
+            "name": "algofame/php-internal-packages",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://abemba: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@github.com/abemba/php-internal-packages.git",
+                "reference": "47d0bec085c05b1e6013928ae8888986dbea6fb5"
+            },
+            "require": {
+                "guzzlehttp/guzzle": ">=7.4",
+                "illuminate/http": "^10.34",
+                "illuminate/support": "^10.34",
+                "php": ">=8.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Algofame\\Internal\\App\\Service\\Auth\\AppAuthProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Algofame\\Internal\\": "src/Internal"
+                }
+            },
+            "description": "PHP library for internal services",
+            "time": "2023-11-30T20:21:59+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.11.0",
@@ -8076,7 +8107,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "algofame/php-internal-packages": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

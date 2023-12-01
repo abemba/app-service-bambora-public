@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Enum;
+
+enum TransactionStatus: string{
+    case SCHEDULED = "SCHEDULED";
+    case PROCESSING = "PROCESSING";
+    case PENDING_BAMBORA = "PENDING_BAMBORA";
+    case ERROR_DISPUTED = "ERROR_DISPUTED";
+    case ERROR_INSF_FUNDS = "ERROR_INSF_FUNDS";
+    case ERROR_INVALID_ACCOUNT = "ERROR_INVALID_ACCOUNT";
+    case ERROR_ACCOUNT_CLOSED = "ERROR_ACCOUNT_CLOSED";
+    case COMPLETED = "COMPLETED";
+    case CANCELLED = "CANCELLED";
+}

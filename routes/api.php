@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::controller(\App\Http\Controllers\AppController::class)
+->middleware(\Algofame\Internal\App\Service\Auth\AppAuthMiddleware::class)
+->group(function(){
+    Route::post("accounts","createBankAccount");
+    Route::post("accounts/{account}/transactions","createTransaction");
+    Route::get("accounts/{account}/transactions/{transaction}","getTransaction");
 });
