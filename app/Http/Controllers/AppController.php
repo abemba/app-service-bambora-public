@@ -47,6 +47,14 @@ class AppController extends Controller
         
         return $account;
     }
+
+    public function getPeriodicTransaction(BankAccount $account, PeriodicTransaction $periodic){
+        return $periodic;
+    }
+
+    public function getAccount(BankAccount $account){
+        return $account;
+    }
     
     /**
      * Create transaction

@@ -18,7 +18,11 @@ Route::controller(\App\Http\Controllers\AppController::class)
 ->middleware(\Algofame\Internal\App\Service\Auth\AppAuthMiddleware::class)
 ->group(function(){
     Route::post("accounts","createBankAccount");
+    Route::post("accounts/{account}","getAccount");
+    
     Route::post("accounts/{account}/transactions","createTransaction");
-    Route::post("accounts/{account}/periodic","createPeriodicTransaction");
     Route::get("accounts/{account}/transactions/{transaction}","getTransaction");
+
+    Route::post("accounts/{account}/periodic","createPeriodicTransaction");
+    Route::get("accounts/{account}/periodic/{periodic}","getPeriodicTransaction");
 });
