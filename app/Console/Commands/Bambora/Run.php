@@ -25,6 +25,16 @@ class Run extends Command
      */
     public function handle()
     {
-        // (0)Check (1) File (2) Upload
+        $this->info("Checking periodic transactions.");
+        $this->call("bambora:periodic");
+
+        $this->info("Creating CSV file");
+        $this->call("bambora:file");
+
+        $this->info("Uploading file");
+        $this->call("bambora:upload");
+
+        $this->info("Checking transaction status");
+        $this->call("bambora:check");
     }
 }

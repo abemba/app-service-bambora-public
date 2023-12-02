@@ -36,11 +36,16 @@ class Upload extends Command
 
         try {
             $batch_items->each(function($batch){
-                $batch->upload_date = date("Y-m-d");
+                $batch->upload_date = Carbon::now()->format("Y-m-d");
                 $batch->save();
 
+                $process_date = Carbon::now();
+                if($process_date->isWeekend()){
+                    $process_date = $process_date->nextWeekday();
+                }
+
                 $response = $this->uploadBatch(
-                    date_param: Carbon::createFromFormat("Y-m-d", $batch->upload_date),
+                    process_date: $process_date,
                     path: $batch->filename);
 
                 if($response->getStatusCode() == 200){
@@ -52,7 +57,7 @@ class Upload extends Command
 
                     Transaction::whereBamboraBatchId($batch->id)->update(["status" => TransactionStatus::UPLOADED_TO_BAMBORA]);
                 }else{
-                    $this->error("Batch upload failed.");
+                    $this->error("Batch upload attempt failed.");
                 }
 
                 sleep(15);
@@ -67,7 +72,7 @@ class Upload extends Command
     /**
      * Uploads a batch file to Bambora
      */
-    private function uploadBatch(Carbon $date_param, string $path){
+    private function uploadBatch(Carbon $process_date, string $path){
         $passcode = config("bambora.batch_payment_passcode");
         $this->info($path);
         $link = "https://api.na.bambora.com/v1/batchpayments";
@@ -86,7 +91,7 @@ class Upload extends Command
 					[
                         [
                             "name"=>"criteria",
-							"contents"=>'{"process_date":"'.$date_param->format("Ymd").'"}',
+							"contents"=>'{"process_date":"'.$process_date->format("Ymd").'"}',
 							"headers"=>["content-type"=>"application/json"]
 						],
 						[
