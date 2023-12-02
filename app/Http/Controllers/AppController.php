@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Algofame\Internal\App\Service\Auth\AppAuth;
+use App\Enum\PeriodicTransactionStatus;
 use App\Enum\TransactionStatus;
 use App\Models\BankAccount;
+use App\Models\PeriodicTransaction;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -75,6 +77,35 @@ class AppController extends Controller
         return $transaction;
     }
     
+    /**
+     * Creates a periodic transaction
+     */
+    public function createPeriodicTransaction(Request $request, BankAccount $account){
+        $request->validate([
+        "start_on" => "date|equel_or_after:today",
+        "completes_on" => "date|after:start_on",
+        "amount" => "required|integer|min:1",
+        "frequency_in_days" => "required|integer|min:1",
+        "descriptor" => "string|max:15",
+        "type" => "required|string|in:credit,debit",
+    ]);
+        $periodic = new PeriodicTransaction(
+            [
+                "amount" => $request->input("amount"),
+                "type" => $request->input("type"),
+                "status" => PeriodicTransactionStatus::ACTIVE,
+                "frequency_in_days" => $request->input("frequency_in_days"),
+                "descriptor" => $request->input("descriptor"),
+                "started_on" => $request->input("start_on") ?? date("Y-m-d"),
+                "completed_on" => $request->input("completes_on"),
+                "bank_account_id" => $account->id
+            ]);
+        $periodic->id = $periodic->generateUniqueId();
+        $periodic->save();
+
+        return $periodic;
+    }
+
     /**
      * Gets a transaction
      */

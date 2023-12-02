@@ -19,5 +19,6 @@ Route::controller(\App\Http\Controllers\AppController::class)
 ->group(function(){
     Route::post("accounts","createBankAccount");
     Route::post("accounts/{account}/transactions","createTransaction");
+    Route::post("accounts/{account}/periodic","createPeriodicTransaction");
     Route::get("accounts/{account}/transactions/{transaction}","getTransaction");
 });

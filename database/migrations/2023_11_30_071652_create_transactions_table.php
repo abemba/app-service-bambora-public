@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->string("id")->unique();
             $table->string("bank_account_id");
+            $table->string("periodic_transaction_id")->nullable();
             $table->bigInteger("amount");
             $table->string("status");
             $table->enum("type",["credit","debit"]);
