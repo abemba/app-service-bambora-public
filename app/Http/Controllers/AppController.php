@@ -24,7 +24,7 @@ class AppController extends Controller
         "app_name" => "required|string",
         "first_name" => "required|string",
         "last_name" => "required|string",
-        "middle_name" => "string",
+        "middle_name" => "string|nullable",
     ]);
         $account = BankAccount::whereAppName($authToken->getAppName())
         ->whereAccountNumber($request->input("account_number"))
