@@ -76,7 +76,7 @@ class AppController extends Controller
         }
         
         $transaction = new Transaction($request->only(["type","amount","descriptor"]));
-        $transaction->scheduled_for = $request->has("schedule_for") ? $request->input("schedule_for") : date("Y-m-d");
+        $transaction->scheduled_for = $request->input("schedule_for") ?? date("Y-m-d");
         $transaction->status = TransactionStatus::SCHEDULED;
         $transaction->id = $transaction->generateUniqueId();
         $transaction->bank_account_id = $account->id;
