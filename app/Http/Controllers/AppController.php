@@ -65,7 +65,7 @@ class AppController extends Controller
         "type" => "required|in:credit,debit",
         "amount"=> "required|integer|min:1",
         "descriptor"=> "string|min:1|max:20",
-        "schedule_for"=> "date|date_format:Y-m-d|after_or_equel:today",
+        "schedule_for"=> "date|date_format:Y-m-d|after_or_equal:today",
     ]);
         
         /**
