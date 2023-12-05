@@ -26,7 +26,9 @@ class AppController extends Controller
         $webhook = Webhook::whereAppName($appAuth->getAppName())->first();
         if(!$webhook){
             $webhook = new Webhook();
+            $webhook->app_name = $appAuth->getAppName();
         }
+        $webhook->id = $webhook->generateUniqueId();
         $webhook->endpoint = $request->input("endpoint");
         $webhook->secret = $request->input("secret");
         $webhook->save();
