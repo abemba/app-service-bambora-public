@@ -8,11 +8,32 @@ use App\Enum\TransactionStatus;
 use App\Models\BankAccount;
 use App\Models\PeriodicTransaction;
 use App\Models\Transaction;
+use App\Models\Webhook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AppController extends Controller
 {
+    /**
+     * Updates webhook for specific app
+     */
+    public function updateWebhookConfig(Request $request, AppAuth $appAuth){
+        $validated = $request->validate(
+            [
+                "endpoint" => "required|url",
+                "secret" => "required|string|min:32"
+            ]);
+        $webhook = Webhook::whereAppName($appAuth->getAppName())->first();
+        if(!$webhook){
+            $webhook = new Webhook();
+        }
+        $webhook->endpoint = $request->input("endpoint");
+        $webhook->secret = $request->input("secret");
+        $webhook->save();
+
+        return $webhook;
+    }
+
     /**
      * Creates a bank account
      */

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::controller(\App\Http\Controllers\AppController::class)
 ->middleware(\Algofame\Internal\App\Service\Auth\AppAuthMiddleware::class)
 ->group(function(){
+    Route::post("webhook","updateWebhookConfig");
     Route::post("accounts","createBankAccount");
     Route::post("accounts/{account}","getAccount");
     

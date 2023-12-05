@@ -5,9 +5,13 @@ namespace App\Console\Commands\Bambora;
 use App\Enum\BamboraBatchStatus;
 use App\Enum\TransactionStatus;
 use App\Models\BamboraBatch;
+use App\Models\BankAccount;
 use App\Models\Transaction;
+use App\Models\Webhook;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
+use Spatie\WebhookServer\WebhookCall;
 
 class Upload extends Command
 {
@@ -56,11 +60,39 @@ class Upload extends Command
                     $batch->save();
 
                     Transaction::whereBamboraBatchId($batch->id)->update(["status" => TransactionStatus::UPLOADED_TO_BAMBORA]);
+
+                    /** Webhook **/
+                    $webhook_config_cache = [];
+                    $grouped = Transaction::whereBamboraBatch($batch->id)->get()->groupBy("bank_account_id");
+                    $grouped->each(function(Collection $transactions, string $account_id) use(&$webhook_config_cache){
+                        $account = BankAccount::whereId($account_id)->first();
+                        if(array_key_exists($account->app_name,$webhook_config_cache)){
+                            $webhook_config = $webhook_config_cache[$account->app_name];
+                        }else{
+                            $webhook_config = Webhook::whereAppName($account->app_name)->first();
+                            $webhook_config_cache[$account->app_name] = $webhook_config;
+                        }
+
+                        if($webhook_config){
+                            $call = WebhookCall::create()->url($webhook_config->endpoint);
+                            if($webhook_config->secret){
+                                $call = $call->useSecret($webhook_config->secret);
+                            }else{
+                                $call = $call->doNotSign();
+                            }
+                            $call->payload(
+                                [
+                                    "bank_account_id" => $account_id,
+                                    "transactions" => $transactions->map(function($item ) { return $item->id;})->values()->toArray(),
+                                    "status" => TransactionStatus::UPLOADED_TO_BAMBORA->value
+                                ])->dispatchSync();
+                        }
+                    });
                 }else{
                     $this->error("Batch upload attempt failed.");
                 }
 
-                sleep(15);
+                sleep(5);
             });
 
         }catch (\Exception $e){
